@@ -100,7 +100,9 @@ public class Word {
 	 *            Das gesamte Wort (16bit, inklusive MSb)
 	 */
 	public void setWord(String string) {
-		if (string.matches("(0*1*)*") == false) {
+		if (string == null){
+			setWord("0");
+		} else if (string.matches("(0*1*)*") == false) {
 			setWord("0");
 		} else if (string.length() > 16) {
 			setWord(string.substring(-(16 - string.length())));

@@ -95,5 +95,11 @@ public class WordTest {
 		assertTrue('0' == instance.getCharAt(12));
 		assertTrue('0' == instance.getCharAt(15));
 	}
+	
+	@Test
+	public void createWordNull(){
+		instance = new Word(null);
+		assertTrue("0000000000000000".equals(instance.getWord()));
+	}
 
 }
