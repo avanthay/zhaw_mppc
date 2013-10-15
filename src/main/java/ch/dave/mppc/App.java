@@ -1,6 +1,7 @@
 package ch.dave.mppc;
 
-import ch.dave.mppc.model.Word;
+import ch.dave.mppc.model.Register;
+
 
 
 
@@ -14,8 +15,8 @@ public class App {
 
 	public static void main(String[] args) {
 		// start
-		Word test = new Word("00111020");
-		System.out.println(test.getWord());
+		Register hoi = new Register("Akku");
+		System.out.println(hoi.getWord());
 	}
 
 }

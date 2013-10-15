@@ -5,12 +5,13 @@ package ch.dave.mppc.model;
  * verwendet Ein Wort kann nur die Zeichen 0 oder 1 annehmen
  * 
  * @author dave
- * @version 1.0
+ * @version 2.0
  */
 public class Word {
 
 	private char MSb;
 	private String amount;
+	private int value;
 
 	public Word() {
 		setWord("0");
@@ -23,7 +24,13 @@ public class Word {
 	public Word(char MSb, String amount) {
 		setWord(MSb, amount);
 	}
+	
+	public Word(int value){
+		setValue(value);
+	}
 
+	
+	
 	// Interne Methoden
 
 	private String completeString(String string) {
@@ -32,9 +39,18 @@ public class Word {
 		}
 		return string;
 	}
+	
+	private void calculateValue() {
+		int word = Integer.valueOf(amount, 2);
+		if (MSb == '1') {
+			word = word - 32768;
+		}
+		this.value = word;
+	}
 
+	
+	
 	// Getter und Setter
-	// ...
 
 	/**
 	 * 
@@ -69,6 +85,9 @@ public class Word {
 		if (String.valueOf(MSb).matches("(0*1*)*")) {
 			this.MSb = MSb;
 		}
+		if (amount != null){
+		calculateValue();
+		}
 	}
 
 	/**
@@ -84,6 +103,7 @@ public class Word {
 		} else {
 			this.amount = completeString(amount);
 		}
+		calculateValue();
 	}
 
 	/**
@@ -119,36 +139,28 @@ public class Word {
 		setMSb(MSb);
 		setAmount(amount);
 	}
+	
+	public void setValue(int value){
+		if (value == (short) value){
+			setWord(Integer.toBinaryString(value));
+		} else {
+			setWord("0");
+		}
+	}
 
 	/**
 	 * 
-	 * @return das gesamte Wort, inklusive MSb (16bit)
+	 * @return das gesamte Wort als String, inklusive MSb (16bit)
 	 */
 	public String getWord() {
 		String word = String.valueOf(MSb);
 		return word.concat(amount);
 	}
-
-	/**
-	 * 
-	 * @return das Wort als DezimalZahl
-	 */
-	public int getDecimal() {
-		int word = 0;
-		String binary = amount;
-		int x = 14;
-		while (binary.length() > 0) {
-			word += (Integer.valueOf(String.valueOf(binary.charAt(0)))
-					.intValue() * (int) Math.pow(2, x));
-			binary = binary.substring(1);
-			x--;
-		}
-		if (MSb == '1') {
-			word = word * -1;
-		}
-		return word;
+	
+	public int getValue(){
+		return value;
 	}
-
+	
 	// toString & haschcode
 
 	@Override
@@ -158,7 +170,7 @@ public class Word {
 
 	@Override
 	public int hashCode() {
-		return getDecimal();
+		return this.value;
 	}
 
 }
