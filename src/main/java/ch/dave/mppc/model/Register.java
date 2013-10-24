@@ -22,6 +22,16 @@ public class Register extends Word{
 		this.name = name;
 	}
 	
+	public Register(String name, String word){
+		super(word);
+		this.name = name;
+	}
+	
+	public Register(String name, int value){
+		super(value);
+		this.name = name;
+	}
+	
 	/**
 	 * setzt das Register auf 0 zurück
 	 */
@@ -51,12 +61,19 @@ public class Register extends Word{
 	}
 	
 	@Override
+	public boolean equals(Object o){
+		if (o instanceof Register == false)
+			return false;
+		return name.equals(((Register) o).name);
+	}
+	
+	@Override
 	public int hashCode(){
-		int code = 0;
+		int result = 17;
 		for(int i = 0; i < name.length(); i++){
-			code += name.charAt(i) * 17 * i;
+			result = result * 47 + name.charAt(i);
 		}
-		return code;
+		return result;
 	}
 	
 }

@@ -101,5 +101,23 @@ public class WordTest {
 		instance = new Word(null);
 		assertTrue("0000000000000000".equals(instance.getWord()));
 	}
+	
+	@Test
+	public void testEquals(){
+		instance = new Word(32);
+		assertTrue(instance.equals(new Word(32)));
+		assertFalse(instance.equals(new Word(33)));
+		assertTrue(new Word(32).equals(instance));
+	}
+	
+	@Test
+	public void testHashCode(){
+		instance = new Word(45);
+		assertTrue(instance.hashCode() == new Word(45).hashCode());
+		assertFalse(instance.hashCode() == new Word(44).hashCode());
+		instance = new Word("0000000011111111");
+		assertTrue(instance.hashCode() ==  new Word("0000000011111111").hashCode());
+		assertFalse(instance.hashCode() ==  new Word("1000000011111111").hashCode());
+	}
 
 }

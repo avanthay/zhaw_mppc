@@ -167,10 +167,23 @@ public class Word {
 	public String toString() {
 		return getWord();
 	}
+	
+	@Override
+	public boolean equals(Object o){
+		if (o instanceof Word == false)
+			return false;
+		else if (value == ((Word) o).value)
+			return true;
+		return false;
+	}
 
 	@Override
 	public int hashCode() {
-		return this.value;
+		int result = 17;
+		result = result * 47 + MSb;
+		for (int i = 0; i < amount.length(); i++)
+			result = result * 47 + amount.charAt(i);
+		return result;
 	}
 
 }
