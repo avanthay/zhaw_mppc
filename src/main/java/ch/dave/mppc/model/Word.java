@@ -65,6 +65,17 @@ public class Word {
 			return amount.charAt(index - 1);
 		}
 	}
+	
+	public String getSequence(int start, int end){
+		if (end == 0){
+			end = 15;
+		}
+		char[] sequence = new char[(end - start) + 1];
+		for(int i = start; i <= end; i++){
+			sequence[i - start] = getCharAt(i);
+		}
+		return String.valueOf(sequence);
+	}
 
 	/**
 	 * 
@@ -160,6 +171,8 @@ public class Word {
 	public int getValue(){
 		return value;
 	}
+	
+	
 	
 	// toString & haschcode
 

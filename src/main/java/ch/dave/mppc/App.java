@@ -1,6 +1,5 @@
 package ch.dave.mppc;
 
-import ch.dave.mppc.model.Register;
 
 
 
@@ -15,8 +14,6 @@ public class App {
 
 	public static void main(String[] args) {
 		// start
-		Register hoi = new Register("Akku");
-		System.out.println(hoi.getWord());
 	}
 
 }
