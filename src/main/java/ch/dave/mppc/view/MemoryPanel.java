@@ -46,8 +46,11 @@ public class MemoryPanel extends JPanel{
 		dataViewHelpPanel.add(dataViewPanel);
 	}
 	
-	public void setDataMemoryViews(MemoryView memoryView){
+	public void setDataMemoryView(MemoryView memoryView){
 		dataViewPanel.add(memoryView);
 	}
-
+	
+	public void setProgrammMemoryView(MemoryView memoryView){
+		programmViewPanel.add(memoryView);
+	}
 }
