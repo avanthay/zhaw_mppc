@@ -1,35 +1,43 @@
 
 package ch.dave.mppc.controller;
 
-import java.util.HashMap;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import ch.dave.mppc.model.Register;
+import ch.dave.mppc.model.Word;
+import ch.dave.mppc.view.MainView;
 
 public class MainController {
 	
-	private HashMap<String, Register> registers;
+	private MainView mainView;
+	private MemoryController memoryController;
 	
 	public MainController(){
-		createRegisters();
+		mainView = new MainView();
+		memoryController = new MemoryController();
+		
+		mainView.setMemoryPanel(memoryController.getMemoryPanel());
+		
+		//TEST
+		mainView.getButtonBar().setActionListener("reset", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainView.getRegisterPanel().updateRegisterView("Register 1", new Word(34));
+			}
+		});
+		//TEST
 	}
 	
 	
 	
-	//internal methods
-	private void createRegisters(){
-		String name = "Akku";
-		registers.put(name, new Register(name));
-		name = "Reg1";
-		registers.put(name, new Register(name));
-		name = "Reg2";
-		registers.put(name, new Register(name));
-		name = "Reg3";
-		registers.put(name, new Register(name));
-		name = "Command";
-		registers.put(name, new Register(name));
-		name = "Counter";
-		registers.put(name, new Register(name));
-		name = "Carry";
+	
+	public void showView(){
+		mainView.pack();
+		mainView.setVisible(true);
 	}
+	
+	// Internal Methods
+
+	
+
 	
 }

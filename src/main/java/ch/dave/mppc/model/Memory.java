@@ -20,12 +20,11 @@ public class Memory extends HashMap<Integer, Word> {
 	}
 
 	private void initialize() {
-		Word nullWord = new Word(null);
 		for (int i = 100; i < 499; i += 2) {
-			setCommand(i, nullWord);
+			setCommand(i, new Command(new Word(null)));
 		}
 		for (int i = 500; i < 999; i += 2) {
-			setValue(i, nullWord);
+			setValue(i, new Word(null));
 		}
 	}
 
@@ -36,15 +35,15 @@ public class Memory extends HashMap<Integer, Word> {
 	 * 
 	 * @param index
 	 *            Index in welchem das Wort gespeichert werden soll
-	 * @param word
+	 * @param command
 	 *            Das Wort welches abgespeichert werden soll
 	 * @throws IndexOutOfBoundsException
 	 *             wenn Index < 100 oder Index > 498
 	 */
-	public void setCommand(int index, Word word)
+	public void setCommand(int index, Command command)
 			throws IndexOutOfBoundsException {
 		if (499 > index && index >= 100 && index % 2 == 0) {
-			put(Integer.valueOf(index), word);
+			put(Integer.valueOf(index), command);
 		} else {
 			throw new IndexOutOfBoundsException(
 					"available index is 100 to 498, only even number");

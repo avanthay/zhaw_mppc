@@ -1,5 +1,7 @@
 package ch.dave.mppc;
 
+import ch.dave.mppc.controller.MainController;
+
 
 
 
@@ -13,7 +15,8 @@ package ch.dave.mppc;
 public class App {
 
 	public static void main(String[] args) {
-		// start
+		MainController mainController = new MainController();
+		mainController.showView();
 	}
 
 }

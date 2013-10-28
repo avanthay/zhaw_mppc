@@ -14,15 +14,16 @@ public class Word {
 	private int value;
 
 	public Word() {
-		setWord("0");
+		setWordString("0");
 	}
 
 	public Word(String string) {
-		setWord(string);
+		setWordString(string);
 	}
 
 	public Word(char MSb, String amount) {
-		setWord(MSb, amount);
+		setMSb(MSb);
+		setAmount(amount);
 	}
 	
 	public Word(int value){
@@ -48,6 +49,7 @@ public class Word {
 		this.value = word;
 	}
 
+
 	
 	
 	// Getter und Setter
@@ -58,23 +60,29 @@ public class Word {
 	 *            Index des gewünschten char im gesamten Wort (16bit)
 	 * @return das char aus dem 16bit Index
 	 */
-	public char getCharAt(int index) {
+	public int getIntAt(int index) {
 		if (index == 0) {
-			return this.MSb;
+			return Integer.valueOf(String.valueOf(this.MSb));
 		} else {
-			return amount.charAt(index - 1);
+			return Integer.valueOf(String.valueOf(amount.charAt(index - 1)));
 		}
 	}
 	
+	public String getStringAt(int index) {
+		return String.valueOf(getIntAt(index));
+	}
+	
+	public String getSequence(int start){
+		return getSequence(start, 16);
+	}
+	
 	public String getSequence(int start, int end){
-		if (end == 0){
-			end = 15;
-		}
-		char[] sequence = new char[(end - start) + 1];
-		for(int i = start; i <= end; i++){
-			sequence[i - start] = getCharAt(i);
-		}
-		return String.valueOf(sequence);
+		return getWordString().substring(start, end);
+	}
+
+	
+	public String getSplittedString(){
+		return getSequence(0, 8) + " " + getSequence(8);
 	}
 
 	/**
@@ -107,6 +115,7 @@ public class Word {
 	 *            Den 15bit langen Wert des Wortes, ohne MSb (Vorzeichenbit)
 	 */
 	public void setAmount(String amount) {
+		amount = amount.replaceAll(" ", "");
 		if (amount.matches("(0*1*)*") == false) {
 			setAmount("0");
 		} else if (amount.length() > 15) {
@@ -130,13 +139,16 @@ public class Word {
 	 * @param string
 	 *            Das gesamte Wort (16bit, inklusive MSb)
 	 */
-	public void setWord(String string) {
+	public void setWordString(String string) {
+		if (string != null){
+		string = string.replaceAll(" ", "");
+		}
 		if (string == null){
-			setWord("0");
+			setWordString("0");
 		} else if (string.matches("(0*1*)*") == false) {
-			setWord("0");
+			setWordString("0");
 		} else if (string.length() > 16) {
-			setWord(string.substring(-(16 - string.length())));
+			setWordString(string.substring(-(16 - string.length())));
 		} else if (string.length() == 16) {
 			setMSb(string.charAt(0));
 			setAmount(string.substring(1));
@@ -145,17 +157,12 @@ public class Word {
 			setAmount(string);
 		}
 	}
-
-	public void setWord(char MSb, String amount) {
-		setMSb(MSb);
-		setAmount(amount);
-	}
 	
 	public void setValue(int value){
 		if (value == (short) value){
-			setWord(Integer.toBinaryString(value));
+			setWordString(Integer.toBinaryString(value));
 		} else {
-			setWord("0");
+			setWordString("0");
 		}
 	}
 
@@ -163,7 +170,7 @@ public class Word {
 	 * 
 	 * @return das gesamte Wort als String, inklusive MSb (16bit)
 	 */
-	public String getWord() {
+	public String getWordString() {
 		String word = String.valueOf(MSb);
 		return word.concat(amount);
 	}
@@ -178,7 +185,7 @@ public class Word {
 
 	@Override
 	public String toString() {
-		return getWord();
+		return getWordString();
 	}
 	
 	@Override
