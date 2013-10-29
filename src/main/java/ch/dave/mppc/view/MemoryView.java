@@ -26,9 +26,12 @@ public class MemoryView extends JPanel{
 		
 		programmPanel.add(new TitlePanel("Programm", 0, 1, 1, 1), BorderLayout.NORTH);
 		
+		JPanel programmViewHelpPanel = new JPanel();
+		programmPanel.add(programmViewHelpPanel, BorderLayout.CENTER);
+		
 		programmViewPanel = new JPanel();
 		programmViewPanel.setLayout(new BoxLayout(programmViewPanel, BoxLayout.Y_AXIS));
-		programmPanel.add(programmViewPanel, BorderLayout.CENTER);
+		programmViewHelpPanel.add(programmViewPanel);
 		
 		
 		// DataPanel
@@ -44,6 +47,14 @@ public class MemoryView extends JPanel{
 		dataViewPanel = new JPanel();
 		dataViewPanel.setLayout(new BoxLayout(dataViewPanel, BoxLayout.Y_AXIS));
 		dataViewHelpPanel.add(dataViewPanel);
+	}
+	
+	public void setProgrammMemoryPanel(MemoryPanel memoryPanel){
+		programmViewPanel.add(memoryPanel);
+	}
+	
+	public void removeProgrammMemoryPanels(){
+		programmViewPanel.removeAll();
 	}
 	
 	public void setDataMemoryPanel(MemoryPanel memoryPanel){

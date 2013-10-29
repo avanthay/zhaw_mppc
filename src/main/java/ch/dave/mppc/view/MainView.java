@@ -1,7 +1,6 @@
 package ch.dave.mppc.view;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
@@ -21,7 +20,7 @@ public class MainView extends JFrame{
 		
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setPreferredSize(new Dimension(1200, 600));
+		setResizable(false);
 		
 		// South
 		southPanel = new JPanel();

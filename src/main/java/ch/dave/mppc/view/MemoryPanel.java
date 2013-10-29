@@ -20,11 +20,14 @@ public class MemoryPanel extends JPanel{
 	private JTextField idTextField;
 	private JTextField binaryTextField;
 	private JTextField decodedTextField;
+	
+	private Color originalBackGroundColor;
 
 	
 	public MemoryPanel(Integer id, Word word){
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		originalBackGroundColor = getBackground();
 		
 		idTextField = new JTextField(6);
 		idTextField.setEditable(false);
@@ -41,6 +44,13 @@ public class MemoryPanel extends JPanel{
 		updateFieldsWithoutColor(id, word);
 	}
 
+	public void setColored(boolean colored){
+		if (colored){
+			setBackground(Color.GREEN);
+		} else {
+			setBackground(originalBackGroundColor);
+		}
+	}
 	
 	public void updateFields(Integer id, Word word){
 		updateFieldsWithoutColor(id, word);

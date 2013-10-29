@@ -36,7 +36,7 @@ public class Memory extends HashMap<Integer, Word> {
 	 * @param index
 	 *            Index in welchem das Wort gespeichert werden soll
 	 * @param command
-	 *            Das Wort welches abgespeichert werden soll
+	 *            Das Command welches abgespeichert werden soll
 	 * @throws IndexOutOfBoundsException
 	 *             wenn Index < 100 oder Index > 498
 	 */

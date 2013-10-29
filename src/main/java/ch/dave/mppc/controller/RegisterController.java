@@ -3,6 +3,7 @@ package ch.dave.mppc.controller;
 import java.util.HashMap;
 
 import ch.dave.mppc.model.Command;
+import ch.dave.mppc.model.Register;
 import ch.dave.mppc.model.Word;
 import ch.dave.mppc.view.RegisterView;
 import ch.dave.mppc.view.RegisterPanel;
@@ -20,6 +21,10 @@ public class RegisterController {
 		createRegisterPanels();
 	}
 	
+	/**
+	 * @param name Konstante aus der Klasse Register (z.b. Register.BEFEHLSZAEHLER)
+	 * @param word das Wort welches im Register platziert werden soll
+	 */
 	public void updateRegisterPanel(String name, Word word){
 		registerPanels.get(name).updateFields(word);
 	}
@@ -36,7 +41,9 @@ public class RegisterController {
 
 	// internal method
 	private void createRegisterPanels(){
-		String[] registerName = {"Befehlszähler", "Befehlsregister", "Akku", "Register 1", "Register 2", "Register 3", "Carry"};
+		String[] registerName = {Register.BEFEHLSZAEHLER, Register.BEFEHLSREGISTER,
+				Register.AKKU, Register.REGISTER_1, Register.REGISTER_2, Register.REGISTER_3,
+				Register.CARRY};
 		RegisterPanel registerView = null;
 		for (int i = 0; i < 7; i++){
 			if (i != 1){
