@@ -10,18 +10,25 @@ import ch.dave.mppc.view.MainView;
 public class MainController {
 	
 	private MainView mainView;
+	private RegisterController registerController;
 	private MemoryController memoryController;
+	private ButtonController buttonController;
 	
 	public MainController(){
 		mainView = new MainView();
+		registerController = new RegisterController();
 		memoryController = new MemoryController();
+		buttonController = new ButtonController();
 		
-		mainView.setMemoryPanel(memoryController.getMemoryPanel());
+		
+		mainView.setRegisterView(registerController.getRegisterView());
+		mainView.setMemoryView(memoryController.getMemoryView());
+		mainView.setButtonBar(buttonController.getButtonBar());
 		
 		//TEST
-		mainView.getButtonBar().setActionListener("reset", new ActionListener() {
+		buttonController.getButtonBar().setActionListener("reset", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainView.getRegisterPanel().updateRegisterView("Register 1", new Word(34));
+				registerController.updateRegisterPanel("Register 1", new Word(34));
 			}
 		});
 		//TEST

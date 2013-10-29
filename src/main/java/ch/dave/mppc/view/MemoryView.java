@@ -1,82 +1,53 @@
 package ch.dave.mppc.view;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
-import javax.swing.event.DocumentListener;
 
-import ch.dave.mppc.model.Command;
-import ch.dave.mppc.model.Word;
+import ch.dave.mppc.utilities.TitlePanel;
 
 public class MemoryView extends JPanel{
 	
-	private static final long serialVersionUID = -5726004405193005804L;
+	private static final long serialVersionUID = -4976705482061558691L;
 	
-	private JTextField idTextField;
-	private JTextField binaryTextField;
-	private JTextField decodedTextField;
-
+	private JPanel programmViewPanel;
+	private JPanel dataViewPanel;
 	
-	public MemoryView(Integer id, Word word){
+	public MemoryView() {
 		
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new GridLayout(1, 2));
 		
-		idTextField = new JTextField(6);
-		idTextField.setEditable(false);
-		idTextField.setFocusable(false);
-		add(idTextField);
+		// ProgrammPanel
+		JPanel programmPanel = new JPanel();
+		programmPanel.setLayout(new BorderLayout());
+		add(programmPanel);
 		
-		binaryTextField = new JTextField(13);
-		binaryTextField.setHorizontalAlignment(JTextField.CENTER);
-		add(binaryTextField);
+		programmPanel.add(new TitlePanel("Programm", 0, 1, 1, 1), BorderLayout.NORTH);
 		
-		decodedTextField = new JTextField(10);
-		add(decodedTextField);
+		programmViewPanel = new JPanel();
+		programmViewPanel.setLayout(new BoxLayout(programmViewPanel, BoxLayout.Y_AXIS));
+		programmPanel.add(programmViewPanel, BorderLayout.CENTER);
 		
-		updateFieldsWithoutColor(id, word);
+		
+		// DataPanel
+		JPanel dataPanel = new JPanel();
+		dataPanel.setLayout(new BorderLayout());
+		add(dataPanel);
+		
+		dataPanel.add(new TitlePanel("Daten", 0, 0, 1, 0), BorderLayout.NORTH);
+		
+		JPanel dataViewHelpPanel = new JPanel();
+		dataPanel.add(dataViewHelpPanel, BorderLayout.CENTER);
+		
+		dataViewPanel = new JPanel();
+		dataViewPanel.setLayout(new BoxLayout(dataViewPanel, BoxLayout.Y_AXIS));
+		dataViewHelpPanel.add(dataViewPanel);
+	}
+	
+	public void setDataMemoryPanel(MemoryPanel memoryPanel){
+		dataViewPanel.add(memoryPanel);
 	}
 
-	
-	public void updateFields(Integer id, Word word){
-		updateFieldsWithoutColor(id, word);
-		idTextField.setBackground(Color.YELLOW);
-		binaryTextField.setBackground(Color.YELLOW);
-		decodedTextField.setBackground(Color.YELLOW);
-		hideColor();
-	}
-	
-	public void setDocumentListener(DocumentListener documentListener){
-		binaryTextField.getDocument().addDocumentListener(documentListener);
-	}
-
-	
-	
-	// internal Methods
-	private void updateFieldsWithoutColor(Integer id, Word word){
-		idTextField.setText(String.valueOf(id) + " + " + String.valueOf(id + 1));
-		binaryTextField.setText(word.getSplittedString());
-		if (word instanceof Command){
-			decodedTextField.setText(((Command) word).getMnemonics());
-		} else {
-			decodedTextField.setText(String.valueOf(word.getValue()));
-		}
-	}
-	
-	private void hideColor(){
-		Timer timer = new Timer(600, new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				idTextField.setBackground(Color.WHITE);
-				binaryTextField.setBackground(Color.WHITE);
-				decodedTextField.setBackground(Color.WHITE);
-			}
-		});
-		timer.setRepeats(false);
-		timer.start();
-	}
-	
 }

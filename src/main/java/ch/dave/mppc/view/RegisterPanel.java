@@ -1,49 +1,66 @@
 package ch.dave.mppc.view;
 
-import java.util.HashMap;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.border.EtchedBorder;
 
 import ch.dave.mppc.model.Command;
 import ch.dave.mppc.model.Word;
 
-public class RegisterPanel extends JPanel{
-	
-	private static final long serialVersionUID = -7123482026921783419L;
-	
-	private JPanel registersPanel;
-	private HashMap<String, RegisterView> registerViews;
+public class RegisterPanel extends JPanel {
 
+	private static final long serialVersionUID = 1334002883379903634L;
 	
-	public RegisterPanel() {
-
-		registerViews = new HashMap<String, RegisterView>();
+	private JTextField binaryTextField;
+	private JTextField decodedTextField;
+	
+	public RegisterPanel(String name, Word word){
 		
-		registersPanel = new JPanel();
-		registersPanel.setLayout(new BoxLayout(registersPanel, BoxLayout.Y_AXIS));
-		add(registersPanel);
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), name));
 		
-		createRegisterViews();
-	}
-
-	public void updateRegisterView(String name, Word word){
-		registerViews.get(name).updateFields(word);
+		binaryTextField = new JTextField(13);
+		binaryTextField.setHorizontalAlignment(JTextField.CENTER);
+		binaryTextField.setEditable(false);
+		add(binaryTextField);
+		
+		decodedTextField = new JTextField(10);
+		decodedTextField.setEditable(false);
+		add(decodedTextField);
+		
+		updateFieldsWithoutColor(word);
 	}
 	
+	public void updateFields(Word word){
+		updateFieldsWithoutColor(word);
+		binaryTextField.setBackground(Color.YELLOW);
+		decodedTextField.setBackground(Color.YELLOW);
+		hideColor();
+	}
 	
-	// internal Methods
-	private void createRegisterViews(){
-		String[] registerName = {"Befehlszähler", "Befehlsregister", "Akku", "Register 1", "Register 2", "Register 3", "Carry"};
-		RegisterView registerView = null;
-		for (int i = 0; i < 7; i++){
-			if (i != 1){
-			registerView = new RegisterView(registerName[i], new Word(0));
-			} else {
-			registerView = new RegisterView(registerName[i], new Command(new Word(0)));
-			}
-			registerViews.put(registerName[i], registerView);
-			registersPanel.add(registerView);
+	// internal Method
+	private void updateFieldsWithoutColor(Word word){
+		binaryTextField.setText(word.getSplittedString());
+		if(word instanceof Command){
+			decodedTextField.setText(((Command) word).getMnemonics());
+		} else {
+			decodedTextField.setText(String.valueOf(word.getValue()));
 		}
+	}
+	
+	private void hideColor(){
+		Timer timer = new Timer(600, new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				binaryTextField.setBackground(Color.WHITE);
+				decodedTextField.setBackground(Color.WHITE);
+			}
+		});
+		timer.setRepeats(false);
+		timer.start();
 	}
 }

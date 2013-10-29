@@ -14,8 +14,8 @@ public class MainView extends JFrame{
 	private static final long serialVersionUID = 1875186554513342928L;
 	
 	private JPanel centerPanel;
-	private RegisterPanel registerPanel;
-	private ButtonBar buttonBar;
+	private JPanel westCenterPanel;
+	private JPanel southPanel;
 	
 	public MainView(){
 		
@@ -23,27 +23,22 @@ public class MainView extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setPreferredSize(new Dimension(1200, 600));
 		
-		// North
-		JPanel northPanel = new JPanel();
-		northPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		add(northPanel, BorderLayout.NORTH);
-		
-		this.buttonBar = new ButtonBar();
-		northPanel.add(buttonBar);
+		// South
+		southPanel = new JPanel();
+		southPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		add(southPanel, BorderLayout.SOUTH);
 		
 		// WestPanel
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BorderLayout());
 		add(westPanel, BorderLayout.WEST);
 		
-		JPanel westCenterPanel = new JPanel();
+		westCenterPanel = new JPanel();
 		westCenterPanel.setLayout(new BorderLayout());
 		westPanel.add(westCenterPanel, BorderLayout.CENTER);
 		
 		westCenterPanel.add(new TitlePanel("Register", 1, 0, 1, 0), BorderLayout.NORTH);
 		
-		this.registerPanel = new RegisterPanel();
-		westCenterPanel.add(registerPanel, BorderLayout.CENTER);
 		
 		// CenterPanel
 		centerPanel = new JPanel();
@@ -59,16 +54,16 @@ public class MainView extends JFrame{
 
 	}
 	
-	public void setMemoryPanel(MemoryPanel memoryPanel){
-		centerPanel.add(memoryPanel, BorderLayout.CENTER);		
+	public void setMemoryView(MemoryView memoryView){
+		centerPanel.add(memoryView, BorderLayout.CENTER);		
+	}
+	
+	public void setRegisterView(RegisterView registerView){
+		westCenterPanel.add(registerView, BorderLayout.CENTER);
 	}
 
-	public RegisterPanel getRegisterPanel() {
-		return registerPanel;
-	}
-
-	public ButtonBar getButtonBar() {
-		return buttonBar;
+	public void setButtonBar(ButtonBar buttonBar) {
+		southPanel.add(buttonBar);
 	}
 }
 
