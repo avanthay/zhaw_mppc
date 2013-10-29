@@ -4,6 +4,8 @@ package ch.dave.mppc.controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import ch.dave.mppc.model.Command;
+import ch.dave.mppc.model.Register;
 import ch.dave.mppc.view.MainView;
 
 public class MainController {
@@ -52,13 +54,15 @@ public class MainController {
 		});
 		buttonController.setStepActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				memoryController.setCommand(180, new Command("SWDD R0, #230"));
+				memoryController.updateProgrammPanels(180);
 				showView();
 			}
 		});
 		buttonController.setResetActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				registerController.getRegisterPanel(Register.BEFEHLSREGISTER).updateFields(new Command("ADDD #423"));;
+				memoryController.getMemoryPanel(180).setColoredTextFields();
 				showView();
 			}
 		});

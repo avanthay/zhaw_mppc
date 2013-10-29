@@ -34,8 +34,8 @@ public class RegisterController {
 		return view;
 	}
 
-	public HashMap<String, RegisterPanel> getRegisterPanels() {
-		return registerPanels;
+	public RegisterPanel getRegisterPanel(String name) {
+		return registerPanels.get(name);
 	}
 
 

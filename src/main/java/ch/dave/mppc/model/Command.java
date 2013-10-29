@@ -263,7 +263,7 @@ public class Command extends Word{
 		this.mnemonics = name + " R" + registerName + ", #" + address;
 	}
 	
-	private void convertMnemorics(){
+	private void convertMnemorics() throws IllegalArgumentException{
 		String[] splittedMnemorics = mnemonics.replace("#", "").replace(",", "").split(Pattern.quote( " " ));
 		this.name = splittedMnemorics[0];
 		String[] namedCommands = {"INC", "DEC", "SRA", "SLA", "SRL", "SLL", "END"};
@@ -281,17 +281,22 @@ public class Command extends Word{
 				}
 			}
 		}
+		try {
 		if (selectedArray == namedCommands){
 			//already named
 		} else if (selectedArray == namedNumberedCommands){
 			this.number = Integer.valueOf(splittedMnemorics[1]);
 		} else if (selectedArray == namedRegistredCommands){
-			this.registerNr = Integer.valueOf(splittedMnemorics[1]);
+//todo :muss geprüft werden ob Register zwischen 0 und 3 // bei Adresse auch!
+			this.registerNr = Integer.valueOf(splittedMnemorics[1].replace("R", ""));
 		} else if (selectedArray == namedAdressedCommands){
 			this.address = Integer.valueOf(splittedMnemorics[1]);
 		} else if (selectedArray == namedRegistredAdressedCommands){
 			this.registerNr = Integer.valueOf(splittedMnemorics[1].replace("R", ""));
 			this.address = Integer.valueOf(splittedMnemorics[2]);
+		}
+		} catch (Exception e) {
+			throw new IllegalArgumentException("word " + mnemonics + " is not accepted");
 		}
 			
 		createWord();

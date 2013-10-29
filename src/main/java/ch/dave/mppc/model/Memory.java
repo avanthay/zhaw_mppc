@@ -21,10 +21,10 @@ public class Memory extends HashMap<Integer, Word> {
 
 	private void initialize() {
 		for (int i = 100; i < 499; i += 2) {
-			setCommand(i, new Command(new Word(null)));
+			setCommand(i, new Command(new Word(0)));
 		}
 		for (int i = 500; i < 999; i += 2) {
-			setValue(i, new Word(null));
+			setValue(i, new Word(0));
 		}
 	}
 

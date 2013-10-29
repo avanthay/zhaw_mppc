@@ -139,14 +139,14 @@ public class Word {
 	 * @param string
 	 *            Das gesamte Wort (16bit, inklusive MSb)
 	 */
-	public void setWordString(String string) {
+	public void setWordString(String string) throws IllegalArgumentException{
 		if (string != null){
 		string = string.replaceAll(" ", "");
 		}
-		if (string == null){
-			setWordString("0");
+		if (string.equals("")){
+			throw new IllegalArgumentException("Word " + string + " is not accepted as word");
 		} else if (string.matches("(0*1*)*") == false) {
-			setWordString("0");
+			throw new IllegalArgumentException("Word " + string + "is not accepted as word");
 		} else if (string.length() > 16) {
 			setWordString(string.substring(-(16 - string.length())));
 		} else if (string.length() == 16) {
@@ -158,11 +158,11 @@ public class Word {
 		}
 	}
 	
-	public void setValue(int value){
+	public void setValue(int value) throws IllegalArgumentException{
 		if (value == (short) value){
 			setWordString(Integer.toBinaryString(value));
 		} else {
-			setWordString("0");
+			throw new IllegalArgumentException("Word " + value + " is to big - please choose an index between -32768 and 32767");
 		}
 	}
 
