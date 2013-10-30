@@ -14,18 +14,26 @@ public class MainController {
 	
 	private RegisterController registerController;
 	private MemoryController memoryController;
-	private ButtonController buttonController;
+	private ButtonController controllButtons;
+	private ButtonController programmMemoryButtons;
+	private ButtonController dataMemoryButtons;
 	
 	
 	public MainController(){
 		mainView = new MainView();
 		registerController = new RegisterController();
 		memoryController = new MemoryController();
-		buttonController = new ButtonController();
+		controllButtons = new ButtonController("Start", "Slow", "Step", "Reset");
 		
 		mainView.setRegisterView(registerController.getRegisterView());
 		mainView.setMemoryView(memoryController.getMemoryView());
-		mainView.setButtonBar(buttonController.getButtonBar());
+		mainView.setButtonBar(controllButtons.getButtonBar());
+		
+		programmMemoryButtons = new ButtonController("<", ">");
+		memoryController.getMemoryView().setProgrammButtonBar(programmMemoryButtons.getButtonBar());
+		
+		dataMemoryButtons = new ButtonController("<", ">");
+		memoryController.getMemoryView().setDataButtonBar(dataMemoryButtons.getButtonBar());
 		
 		setListeners();
 	}
@@ -40,29 +48,53 @@ public class MainController {
 	
 	// Internal Methods
 	private void setListeners(){
-		buttonController.setStartActionListener(new ActionListener() {
+		controllButtons.setActionListener("Start", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 				showView();
 			}
 		});
-		buttonController.setSlowActionListener(new ActionListener() {
+		controllButtons.setActionListener("Slow", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 				showView();
 			}
 		});
-		buttonController.setStepActionListener(new ActionListener() {
+		controllButtons.setActionListener("Step", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				memoryController.setCommand(180, new Command("SWDD R0, #230"));
 				memoryController.updateProgrammPanels(180);
 				showView();
 			}
 		});
-		buttonController.setResetActionListener(new ActionListener() {
+		controllButtons.setActionListener("Reset", new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				registerController.getRegisterPanel(Register.BEFEHLSREGISTER).updateFields(new Command("ADDD #423"));;
 				memoryController.getMemoryPanel(180).setColoredTextFields();
+				showView();
+			}
+		});
+		programmMemoryButtons.setActionListener("<", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				memoryController.scrollProgrammPanel(-1);
+				showView();
+			}
+		});
+		programmMemoryButtons.setActionListener(">", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				memoryController.scrollProgrammPanel(1);
+				showView();
+			}
+		});
+		dataMemoryButtons.setActionListener("<", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				memoryController.scrollDataPanel(-1);
+				showView();
+			}
+		});
+		dataMemoryButtons.setActionListener(">", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				memoryController.scrollDataPanel(1);
 				showView();
 			}
 		});

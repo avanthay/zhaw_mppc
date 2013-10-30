@@ -19,7 +19,11 @@ public class MemoryController {
 	private Memory model;
 	private HashMap<Integer, MemoryPanel> memoryPanels;
 	
+	
 	private int coloredMemoryPanel;
+	private int focusedMemoryPanel;
+	
+	private int focusedDataPanel;
 	
 	public MemoryController(){
 		view = new MemoryView();
@@ -29,7 +33,8 @@ public class MemoryController {
 		coloredMemoryPanel = 100;
 		createMemoryPanels();
 		updateProgrammPanels(100);
-		setDataPanels();
+		moveDataPanels(500);
+		
 	}
 	
 	
@@ -48,29 +53,63 @@ public class MemoryController {
 		memoryPanels.get(index).updateFields(command);
 	}
 	
+	/**
+	 * 
+	 * @param actualProgramm das ProgrammPanel welches an 6. Stelle und farbig dargestellt werden soll
+	 */
 	public void updateProgrammPanels(int actualProgramm){
 		verifyIndexProgramm(actualProgramm);
-		
-		memoryPanels.get(coloredMemoryPanel).setColoredPanel(false);
-		coloredMemoryPanel = actualProgramm;
-		memoryPanels.get(actualProgramm).setColoredPanel(true);
-		
+		setColoredPanel(actualProgramm);
+		moveProgrammPanels(actualProgramm);
+	}
+	
+	/**
+	 * 
+	 * @param direction +1 for down-scroll, -1 for up-scroll
+	 */
+	public void scrollProgrammPanel(int direction){
+		moveProgrammPanels(focusedMemoryPanel + (direction * 30));
+	}
+	
+	/**
+	 * 
+	 * @param direction +1 for down-scroll, -1 for up-scroll
+	 */
+	public void scrollDataPanel(int direction){
+		moveDataPanels(focusedDataPanel + (direction * 30));
+	}
+	
+	// internal methods
+	private void moveProgrammPanels(int actualProgramm){
 		view.removeProgrammMemoryPanels();
 		if(actualProgramm < 110){
 			actualProgramm = 110;
 		} else if (actualProgramm > 478){
 			actualProgramm = 478;
 		}
+		focusedMemoryPanel = actualProgramm;
 		for (int i = (actualProgramm - 10); i < (actualProgramm + 22); i = i+2){
 			view.setProgrammMemoryPanel(memoryPanels.get(i));
 		}
 	}
 	
-	// internal methods
-	private void setDataPanels(){
-		for (int i = 500; i < 531; i += 2 ){
+	private void moveDataPanels(int actualData){
+		view.removeDataMemoryPanels();
+		if (actualData < 500){
+			actualData = 500;
+		} else if (actualData > 968){
+			actualData = 968;
+		}
+		focusedDataPanel = actualData;
+		for (int i = actualData; i < (actualData + 31); i += 2 ){
 			view.setDataMemoryPanel(memoryPanels.get(i));
 		}
+	}
+	
+	private void setColoredPanel(int panel){
+		memoryPanels.get(coloredMemoryPanel).setColoredPanel(false);
+		coloredMemoryPanel = panel;
+		memoryPanels.get(panel).setColoredPanel(true);
 	}
 	
 	private void createMemoryPanels(){

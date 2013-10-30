@@ -19,6 +19,7 @@ public class MainView extends JFrame{
 	public MainView(){
 		
 		setLayout(new BorderLayout());
+		setName("dave's mini power-pc");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		

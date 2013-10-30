@@ -2,16 +2,16 @@ package ch.dave.mppc.controller;
 
 import java.awt.event.ActionListener;
 
-import ch.dave.mppc.model.Button;
 import ch.dave.mppc.view.ButtonBar;
 
 public class ButtonController {
 	
 	private ButtonBar view;
 	
-	public ButtonController(){
+	public ButtonController(String ...buttonNames){
 		
-		view = new ButtonBar();
+		view = new ButtonBar(buttonNames);
+		
 		
 	}
 	
@@ -19,20 +19,8 @@ public class ButtonController {
 		return view;
 	}
 	
-	public void setStartActionListener(ActionListener actionListener){
-		view.setActionListener(Button.START, actionListener);
-	}
-	
-	public void setSlowActionListener(ActionListener actionListener){
-		view.setActionListener(Button.SLOW, actionListener);
-	}
-	
-	public void setStepActionListener(ActionListener actionListener){
-		view.setActionListener(Button.STEP, actionListener);
-	}
-	
-	public void setResetActionListener(ActionListener actionListener){
-		view.setActionListener(Button.RESET, actionListener);
+	public void setActionListener(String buttonName, ActionListener actionListener){
+		view.setActionListener(buttonName, actionListener);
 	}
 
 }

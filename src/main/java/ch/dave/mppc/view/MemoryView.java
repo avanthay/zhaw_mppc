@@ -14,6 +14,8 @@ public class MemoryView extends JPanel{
 	
 	private JPanel programmViewPanel;
 	private JPanel dataViewPanel;
+	private JPanel programmViewHelpPanel;
+	private JPanel dataViewHelpPanel;
 	
 	public MemoryView() {
 		
@@ -26,8 +28,11 @@ public class MemoryView extends JPanel{
 		
 		programmPanel.add(new TitlePanel("Programm", 0, 1, 1, 1), BorderLayout.NORTH);
 		
-		JPanel programmViewHelpPanel = new JPanel();
+		programmViewHelpPanel = new JPanel();
+		programmViewHelpPanel.setLayout(new BoxLayout(programmViewHelpPanel, BoxLayout.Y_AXIS));
 		programmPanel.add(programmViewHelpPanel, BorderLayout.CENTER);
+		
+		programmViewHelpPanel.add(new JPanel());
 		
 		programmViewPanel = new JPanel();
 		programmViewPanel.setName("programmView");
@@ -42,8 +47,11 @@ public class MemoryView extends JPanel{
 		
 		dataPanel.add(new TitlePanel("Daten", 0, 0, 1, 0), BorderLayout.NORTH);
 		
-		JPanel dataViewHelpPanel = new JPanel();
+		dataViewHelpPanel = new JPanel();
+		dataViewHelpPanel.setLayout(new BoxLayout(dataViewHelpPanel, BoxLayout.Y_AXIS));
 		dataPanel.add(dataViewHelpPanel, BorderLayout.CENTER);
+		
+		dataViewHelpPanel.add(new JPanel());
 		
 		dataViewPanel = new JPanel();
 		dataViewPanel.setName("dataView");
@@ -59,8 +67,19 @@ public class MemoryView extends JPanel{
 		programmViewPanel.removeAll();
 	}
 	
+	public void setProgrammButtonBar(ButtonBar buttonBar){
+		programmViewHelpPanel.add(buttonBar);
+	}
+	
 	public void setDataMemoryPanel(MemoryPanel memoryPanel){
 		dataViewPanel.add(memoryPanel);
 	}
 
+	public void removeDataMemoryPanels(){
+		dataViewPanel.removeAll();
+	}
+	
+	public void setDataButtonBar(ButtonBar buttonBar){
+		dataViewHelpPanel.add(buttonBar);
+	}
 }
