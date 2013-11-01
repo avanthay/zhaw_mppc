@@ -11,6 +11,7 @@ import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
 import ch.dave.mppc.model.Command;
+import ch.dave.mppc.model.Register;
 import ch.dave.mppc.model.Word;
 
 public class RegisterPanel extends JPanel {
@@ -23,6 +24,7 @@ public class RegisterPanel extends JPanel {
 	public RegisterPanel(String name, Word word){
 		
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), name));
+		setName(name);
 		
 		binaryTextField = new JTextField(13);
 		binaryTextField.setHorizontalAlignment(JTextField.CENTER);
@@ -41,6 +43,13 @@ public class RegisterPanel extends JPanel {
 		binaryTextField.setBackground(Color.YELLOW);
 		decodedTextField.setBackground(Color.YELLOW);
 		hideColor();
+	}
+	
+	public Word getWord(){
+		if (this.getName().equals(Register.BEFEHLSREGISTER)){
+			return new Command(new Word(binaryTextField.getText()));
+		}
+		return new Word(binaryTextField.getText());
 	}
 	
 	// internal Method

@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 
 import ch.dave.mppc.model.Command;
 import ch.dave.mppc.model.Register;
+import ch.dave.mppc.model.Word;
 import ch.dave.mppc.view.MainView;
+import ch.dave.mppc.view.RegisterPanel;
 
 public class MainController {
 	
@@ -62,15 +64,14 @@ public class MainController {
 		});
 		controllButtons.setActionListener("Step", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				memoryController.setCommand(180, new Command("SWDD R0, #230"));
-				memoryController.updateProgrammPanels(180);
+				new Programm().doStep();
+				
 				showView();
 			}
 		});
 		controllButtons.setActionListener("Reset", new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				registerController.getRegisterPanel(Register.BEFEHLSREGISTER).updateFields(new Command("ADDD #423"));;
-				memoryController.getMemoryPanel(180).setColoredTextFields();
+				
 				showView();
 			}
 		});
@@ -100,6 +101,58 @@ public class MainController {
 		});
 	}
 	
+	
+	private class Programm implements Runnable{
 
+		public void run(){
+			while (true){
+				doStep();
+			}
+		}
+		
+		public void doStep(){
+			// lade Befehl in Befehlsregister
+			int aktuellerBefehl = registerController.getRegisterPanel(Register.BEFEHLSZAEHLER).getWord().getValue();
+			registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, new Command(new Word(memoryController.getMemoryPanel(aktuellerBefehl).getBinaryTextField())));
+			// befehl interpretieren
+			doCommand((Command) registerController.getRegisterPanel(Register.BEFEHLSREGISTER).getWord());
+			//...
+		}
+		
+		public void doCommand(Command command){
+			String name = command.getName();
+			int number = command.getNumber();
+			int address = command.getAddress();
+			RegisterPanel akkuReg = registerController.getRegisterPanel(Register.AKKU);
+			Word akkuWord = registerController.getRegisterPanel(Register.AKKU).getWord();
+			String register = null;
+			if (command.getRegisterNr() == 0){
+				register = Register.AKKU;
+			} else if (command.getRegisterNr() == 1){
+				register = Register.REGISTER_1;
+			} else if (command.getRegisterNr() == 2){
+				register = Register.REGISTER_2;
+			} else if (command.getRegisterNr() == 3){
+				register = Register.REGISTER_3;
+			}
+				
+					
+			if (name.equals("CLR")){
+				registerController.getRegisterPanel(register).updateFields(new Word(0));
+			} else if (name.equals("ADD")){
+				if (akkuWord.add(registerController.getRegisterPanel(register).getWord())){
+					akkuReg.updateFields(akkuWord);
+				} else {
+					//†berlauf!!
+				}
+			} else if (name.equals("ADDD")){
+				if (akkuWord.add(new Word(number))){
+					akkuReg.updateFields(akkuWord);
+				}
+			}
+			
+		}
+		
+	}
 	
 }

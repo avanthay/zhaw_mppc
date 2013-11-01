@@ -9,7 +9,7 @@ package ch.dave.mppc.model;
  */
 public class Word {
 
-	private char MSb;
+	private int MSb;
 	private String amount;
 	private int value;
 
@@ -21,7 +21,7 @@ public class Word {
 		setWordString(string);
 	}
 
-	public Word(char MSb, String amount) {
+	public Word(int MSb, String amount) {
 		setMSb(MSb);
 		setAmount(amount);
 	}
@@ -43,7 +43,7 @@ public class Word {
 	
 	private void calculateValue() {
 		int word = Integer.valueOf(amount, 2);
-		if (MSb == '1') {
+		if (MSb == 1) {
 			word = word - 32768;
 		}
 		this.value = word;
@@ -57,7 +57,7 @@ public class Word {
 	/**
 	 * 
 	 * @param index
-	 *            Index des gewÃ¼nschten char im gesamten Wort (16bit)
+	 *            Index des gewŸnschten index im gesamten Wort (16bit)
 	 * @return das char aus dem 16bit Index
 	 */
 	public int getIntAt(int index) {
@@ -90,7 +90,7 @@ public class Word {
 	 * @return Das MSb (Vorzeichenbit). Dieser ist mit 1 negativ und mit 0
 	 *         positiv
 	 */
-	public char getMSb() {
+	public int getMSb() {
 		return MSb;
 	}
 
@@ -100,7 +100,7 @@ public class Word {
 	 *            Das MSb (Vorzeichenbit). Dieser kann mit 1 negativ und mit 0
 	 *            positiv gesetzt werden
 	 */
-	public void setMSb(char MSb) {
+	public void setMSb(int MSb) {
 		if (String.valueOf(MSb).matches("(0*1*)*")) {
 			this.MSb = MSb;
 		}
@@ -150,10 +150,10 @@ public class Word {
 		} else if (string.length() > 16) {
 			setWordString(string.substring(-(16 - string.length())));
 		} else if (string.length() == 16) {
-			setMSb(string.charAt(0));
+			setMSb(Integer.valueOf(string.substring(0, 1)));
 			setAmount(string.substring(1));
 		} else if (string.length() < 16) {
-			setMSb('0');
+			setMSb(0);
 			setAmount(string);
 		}
 	}
@@ -177,6 +177,70 @@ public class Word {
 	
 	public int getValue(){
 		return value;
+	}
+	
+	/**
+	 * 
+	 * @param word das zu addierende Wort
+	 * @return true bei einem †berlauf
+	 */
+	public boolean add(Word word){
+		int sum = value + word.value;
+		if (sum == (short) sum){
+			setValue(sum);
+			return false;
+		}
+		setValue((short) sum);
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param left true for left shift - false for right shift
+	 * @return true bei †berlauf
+	 */
+	public boolean shiftArithmetic(boolean left){
+		if (left){
+			int over = getIntAt(1);
+			setValue((short) (getValue()*2));
+			if (over == 1){
+				return true;
+			}
+			return false;
+		} else {
+			if(getValue()%2 == 1){
+				setValue((getValue() - 1) / 2);
+				return true;
+			} else {
+				setValue(getValue() / 2);
+				return false;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param left true for left shift - false for right shift
+	 * @return true bei †berlauf
+	 */
+	public boolean shiftLogic(boolean left){
+		if (left){
+			int over = getIntAt(0);
+			setMSb(getIntAt(1));
+			setAmount(amount.concat("0"));
+			if (over == 1){
+				return true;
+			}
+			return false;
+		} else {
+			int over = getIntAt(15);
+			setAmount(getStringAt(0).concat(amount.substring(0, 14)));
+			setMSb(0);
+			if (over == 1){
+				return true;
+			}
+			return false;
+		}
 	}
 	
 	

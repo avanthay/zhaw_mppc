@@ -32,26 +32,33 @@ public class WordTest {
 		assertTrue("0000000000000000".equals(instance.getWordString()));
 		instance.setAmount("1");
 		assertTrue("0000000000000001".equals(instance.getWordString()));
-		instance.setMSb('1');
+		instance.setMSb(1);
 		assertTrue("1000000000000001".equals(instance.getWordString()));
-		instance.setMSb('0');
+		instance.setMSb(0);
 		assertTrue("0000000000000001".equals(instance.getWordString()));
 	}
 	
 	@Test
-	public void testNegativeRegex(){
-		instance.setWordString("00111020");
-		assertTrue("0000000000000000".equals(instance.getWordString()));
-		instance.setWordString("00101A0R34");
-		assertTrue("0000000000000000".equals(instance.getWordString()));
-		instance.setMSb('A');
-		assertTrue("0000000000000000".equals(instance.getWordString()));
-		instance.setMSb('8');
-		assertTrue("0000000000000000".equals(instance.getWordString()));
-		instance.setAmount("12345678");
-		assertTrue("0000000000000000".equals(instance.getWordString()));
-		instance.setAmount("abcede0");
-		assertTrue("0000000000000000".equals(instance.getWordString()));
+	public void testAdd(){
+		assertFalse(instance.add(new Word(32767)));
+		instance.setValue(32760);
+		assertTrue(instance.add(new Word(8)));
+	}
+	
+	@Test
+	public void testShift(){
+		instance.setValue(32760);
+		assertFalse(instance.shiftLogic(true));
+		instance.setValue(32760);
+		assertTrue(instance.shiftArithmetic(true));
+		instance.setValue(32761);
+		assertTrue(instance.shiftArithmetic(false));
+		instance.setValue(32761);
+		assertTrue(instance.shiftLogic(false));
+		instance.setValue(-1);
+		assertTrue(instance.shiftLogic(true));
+		instance.setValue(-1);
+		assertTrue(instance.shiftArithmetic(true));
 	}
 	
 	@Test
@@ -69,36 +76,36 @@ public class WordTest {
 	public void testMSb(){
 		instance.setWordString("1000000000000011");
 		instance.setAmount("1001");
-		assertTrue('1' == instance.getMSb());
-		instance.setMSb('1');
-		assertTrue('1' == instance.getMSb());
-		instance.setMSb('0');
-		assertTrue('0' == instance.getMSb());
+		assertTrue(1 == instance.getMSb());
+		instance.setMSb(1);
+		assertTrue(1 == instance.getMSb());
+		instance.setMSb(0);
+		assertTrue(0 == instance.getMSb());
 	}
 	
 	@Test
 	public void testAmount(){
 		instance.setWordString("1001");
-		instance.setMSb('1');
+		instance.setMSb(1);
 		assertTrue("1000000000001001".equals(instance.getWordString()));
-		instance.setMSb('0');
+		instance.setMSb(0);
 		assertTrue("000000000001001".equals(instance.getAmount()));
 	}
 	
 	@Test
-	public void testGetChar(){
+	public void testGetIndex(){
 		instance.setWordString("1111000011110000");
-		assertTrue('1' == instance.getIntAt(0));
-		assertTrue('1' == instance.getIntAt(3));
-		assertTrue('0' == instance.getIntAt(4));
-		assertTrue('1' == instance.getIntAt(11));
-		assertTrue('0' == instance.getIntAt(12));
-		assertTrue('0' == instance.getIntAt(15));
+		assertTrue("1".equals(instance.getStringAt(0)));
+		assertTrue(1 == instance.getIntAt(3));
+		assertTrue(0 == instance.getIntAt(4));
+		assertTrue(1 == instance.getIntAt(11));
+		assertTrue(0 == instance.getIntAt(12));
+		assertTrue("0".equals(instance.getStringAt(15)));
 	}
 	
 	@Test
 	public void createWordNull(){
-		instance = new Word(null);
+		instance = new Word(0);
 		assertTrue("0000000000000000".equals(instance.getWordString()));
 	}
 	

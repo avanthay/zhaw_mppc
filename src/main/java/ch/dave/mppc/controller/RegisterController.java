@@ -25,8 +25,8 @@ public class RegisterController {
 	 * @param name Konstante aus der Klasse Register (z.b. Register.BEFEHLSZAEHLER)
 	 * @param word das Wort welches im Register platziert werden soll
 	 */
-	public void updateRegisterPanel(String name, Word word){
-		registerPanels.get(name).updateFields(word);
+	public void updateRegisterPanel(String registerName, Word word){
+		registerPanels.get(registerName).updateFields(word);
 	}
 	
 	
@@ -54,6 +54,7 @@ public class RegisterController {
 			registerPanels.put(registerName[i], registerView);
 			view.addRegisterPanel(registerView);
 		}
+		registerPanels.get(Register.BEFEHLSZAEHLER).updateFields(new Word(100));
 	}
 
 }
