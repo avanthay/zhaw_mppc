@@ -38,11 +38,9 @@ public class RegisterPanel extends JPanel {
 		updateFieldsWithoutColor(word);
 	}
 	
-	public void updateFields(Word word){
+	public void updateFields(Word word, boolean colored){
 		updateFieldsWithoutColor(word);
-		binaryTextField.setBackground(Color.YELLOW);
-		decodedTextField.setBackground(Color.YELLOW);
-		hideColor();
+		colorateFields(colored);
 	}
 	
 	public Word getWord(){
@@ -50,6 +48,14 @@ public class RegisterPanel extends JPanel {
 			return new Command(new Word(binaryTextField.getText()));
 		}
 		return new Word(binaryTextField.getText());
+	}
+	
+	public void colorateFields(boolean colored){
+		if (colored){
+			binaryTextField.setBackground(Color.YELLOW);
+			decodedTextField.setBackground(Color.YELLOW);
+			hideColor();
+		}
 	}
 	
 	// internal Method

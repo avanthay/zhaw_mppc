@@ -19,6 +19,15 @@ public class Command extends Word{
 	 * @throws IllegalArgumentException Wenn der Befehlsname nicht existiert
 	 */
 	public Command(String name, int number, int registerNr, int address) throws IllegalArgumentException{
+		if(registerNr > 3 || registerNr < 0){
+			throw new IllegalArgumentException("RegisterNr has to be min 0 max 3");
+		}
+		if (registerNr < 500 || registerNr > 998 || registerNr%2 != 0){
+			throw new IllegalArgumentException("Adress has to be between 500 and 998, and Adress has to been an even number");
+		}
+		if (number < -16384 || number > 16383){
+			throw new IllegalArgumentException("Number to add has to be between -16384 & 16383");
+		}
 		this.name = name;
 		this.number = number;
 		this.registerNr = registerNr;
@@ -66,6 +75,7 @@ public class Command extends Word{
 			createMnemonics(name, registerNr);
 		} else if (name.equals("ADD")) {
 			setWordString("0000" + getBinaryRegister() + "1110000000");
+			this.number = -1;
 			createMnemonics(name, registerNr);
 		} else if (name.equals("ADDD")) {
 			setWordString("1" + new Word(number).getSequence(1));
@@ -148,7 +158,7 @@ public class Command extends Word{
 	private void createCommand(){
 		if (getIntAt(0) == 1){
 			this.name = "ADDD";
-			this.number = new Word(getAmount()).getValue();
+			this.number = new Word(getStringAt(1).concat(getSequence(1))).getValue();
 			createMnemonics(name, number);
 		} else if (getIntAt(1) == 1){
 			if (getIntAt(2) == 1){
@@ -240,7 +250,7 @@ public class Command extends Word{
 	}
 
 	private void setRegisterNr() {
-		this.registerNr = new Word(getSequence(4, 6)).getValue();
+		this.registerNr = new Word(getSequence(4, 5)).getValue();
 	}
 	
 	
@@ -285,21 +295,38 @@ public class Command extends Word{
 		if (selectedArray == namedCommands){
 			//already named
 		} else if (selectedArray == namedNumberedCommands){
-			this.number = Integer.valueOf(splittedMnemorics[1]);
+			int numb = Integer.valueOf(splittedMnemorics[1]);
+			if (numb < -16384 || numb > 16383){
+				throw new IllegalArgumentException("Number to add has to be between -16384 & 16383");
+			}
+			this.number = numb;
 		} else if (selectedArray == namedRegistredCommands){
-//todo :muss geprüft werden ob Register zwischen 0 und 3 // bei Adresse auch!
-			this.registerNr = Integer.valueOf(splittedMnemorics[1].replace("R", ""));
+			createRegisterNr(Integer.valueOf(splittedMnemorics[1].replace("R", "")));
 		} else if (selectedArray == namedAdressedCommands){
-			this.address = Integer.valueOf(splittedMnemorics[1]);
+			createAdress(Integer.valueOf(splittedMnemorics[1]));
 		} else if (selectedArray == namedRegistredAdressedCommands){
-			this.registerNr = Integer.valueOf(splittedMnemorics[1].replace("R", ""));
-			this.address = Integer.valueOf(splittedMnemorics[2]);
+			createRegisterNr(Integer.valueOf(splittedMnemorics[1].replace("R", "")));
+			createAdress(Integer.valueOf(splittedMnemorics[2]));
 		}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("word " + mnemonics + " is not accepted");
 		}
 			
 		createWord();
+	}
+	
+	private void createRegisterNr(int regNr){
+		if (regNr < 0 || regNr > 3){
+			throw new IllegalArgumentException("RegisterNr has to be between 0 and 3");
+		}
+		this.registerNr = regNr;
+	}
+	
+	private void createAdress(int address){
+		if (address < 500 || address > 998 || address%2 != 0){
+			throw new IllegalArgumentException("Address has to be between 500 and 998, and Adress has to been an even number");
+		}
+		this.address = address;
 	}
 }
 

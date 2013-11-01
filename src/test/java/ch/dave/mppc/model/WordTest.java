@@ -62,6 +62,19 @@ public class WordTest {
 	}
 	
 	@Test
+	public void testSetStringAt(){
+		instance = new Word("0000 1111 0000 1111");
+		instance.setStringAt(0, "1");
+		assertTrue(instance.getWordString().equals("1000111100001111"));
+		instance.setStringAt(1, "1");
+		assertTrue(instance.getWordString().equals("1100111100001111"));
+		instance.setStringAt(2, "1");
+		assertTrue(instance.getWordString().equals("1110111100001111"));
+		instance.setStringAt(15, "0");
+		assertTrue(instance.getWordString().equals("1110111100001110"));
+	}
+	
+	@Test
 	public void testLength(){
 		instance.setWordString("1011111111111111111000000000000000000000011111111110100000000010000000");
 		assertTrue("0000000010000000".equals(instance.getWordString()));

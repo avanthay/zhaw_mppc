@@ -72,17 +72,30 @@ public class Word {
 		return String.valueOf(getIntAt(index));
 	}
 	
+	public void setStringAt(int index, String value){
+		if (index == 0){
+			this.MSb = Integer.valueOf(value);
+		} else {
+			if (index > 1){
+				this.amount = amount.substring(0, index-1).concat(value).concat(amount.substring(index));
+			} else if (index == 1){
+				this.amount = value.concat(amount.substring(index));
+			}
+		}
+		calculateValue();
+	}
+	
 	public String getSequence(int start){
-		return getSequence(start, 16);
+		return getSequence(start, 15);
 	}
 	
 	public String getSequence(int start, int end){
-		return getWordString().substring(start, end);
+		return getWordString().substring(start, end+1);
 	}
 
 	
 	public String getSplittedString(){
-		return getSequence(0, 8) + " " + getSequence(8);
+		return getSequence(0, 7) + " " + getSequence(8);
 	}
 
 	/**
@@ -192,6 +205,11 @@ public class Word {
 		}
 		setValue((short) sum);
 		return true;
+	}
+	
+	public Word addWithoutCarry(Word word){
+		add(word);
+		return this;
 	}
 	
 	/**

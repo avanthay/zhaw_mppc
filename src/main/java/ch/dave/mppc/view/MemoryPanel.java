@@ -57,7 +57,10 @@ public class MemoryPanel extends JPanel{
 		}
 	}
 	
-	public void setColoredTextFields(){
+	public void setColoredTextFields(boolean colored){
+		if (!colored){
+			return;
+		}
 		idTextField.setBackground(Color.YELLOW);
 		binaryTextField.setBackground(Color.YELLOW);
 		decodedTextField.setBackground(Color.YELLOW);
@@ -70,13 +73,14 @@ public class MemoryPanel extends JPanel{
 		hideColor();
 	}
 	
-	public void updateFields(Word word){
+	public void updateFields(Word word, boolean colored){
 		binaryTextField.setText(word.getSplittedString());
 		if (word instanceof Command){
 			decodedTextField.setText(((Command) word).getMnemonics());
 		} else {
 			decodedTextField.setText(String.valueOf(word.getValue()));
 		}
+		setColoredTextFields(colored);
 	}
 	
 	public void setBinaryTextFieldListener(KeyListener keyListener){
@@ -86,17 +90,13 @@ public class MemoryPanel extends JPanel{
 	public void setDecodedTextFieldListener(KeyListener keyListener){
 		decodedTextField.addKeyListener(keyListener);
 	}
+	
+	public int getId(){
+		return Integer.valueOf(idTextField.getText().substring(0, 3));
+	}
 
-	public String getIdTextField(){
-		return idTextField.getText();
-	}
-	
-	public String getBinaryTextField(){
-		return binaryTextField.getText();
-	}
-	
-	public String getDecodedTextField(){
-		return decodedTextField.getText();
+	public Word getWord(){
+		return new Word(binaryTextField.getText());
 	}
 	
 	
@@ -127,15 +127,15 @@ public class MemoryPanel extends JPanel{
 	
 	private void addGuiFeatureListeners(){
 		FocusListener listener = new FocusListener() {
-			private String textBefore = "";
+			String contentBefore = "";
 			public void focusLost(FocusEvent e) {
-				if (((JTextField) e.getComponent()).getText().equals("")){
-					((JTextField) e.getComponent()).setText(textBefore);
+				if (((JTextField) e.getComponent()).getText().equals(contentBefore)){
+					((JTextField) e.getComponent()).setBackground(Color.WHITE);
 				}
 			}
 			public void focusGained(FocusEvent e) {
-				textBefore = ((JTextField) e.getComponent()).getText();
-				((JTextField) e.getComponent()).setText("");
+				contentBefore = ((JTextField) e.getComponent()).getText();
+				((JTextField) e.getComponent()).setBackground(Color.ORANGE);
 			}
 		};
 		binaryTextField.addFocusListener(listener);

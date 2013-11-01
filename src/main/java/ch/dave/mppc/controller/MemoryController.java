@@ -1,5 +1,6 @@
 package ch.dave.mppc.controller;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
@@ -47,10 +48,28 @@ public class MemoryController {
 		return memoryPanels.get(index);
 	}
 	
-	public void setCommand(int index, Command command){
+	public void setData(int index, Word word, boolean colored){
+		verifyIndexData(index);
+		model.setValue(index, word);
+		memoryPanels.get(index).updateFields(word, colored);
+	}
+	
+	public void setCommand(int index, Command command, boolean colored){
 		verifyIndexProgramm(index);
 		model.setCommand(index, command);
-		memoryPanels.get(index).updateFields(command);
+		memoryPanels.get(index).updateFields(command, colored);
+	}
+	
+	public Command getCommand(int index){
+		verifyIndexProgramm(index);
+		updateProgrammPanels(index);
+		return (Command) model.get(index);
+	}
+	
+	public Word getData(int index, boolean colored){
+		verifyIndexData(index);
+		memoryPanels.get(index).setColoredTextFields(colored);
+		return model.get(index);
 	}
 	
 	/**
@@ -121,7 +140,13 @@ public class MemoryController {
 	
 	private void verifyIndexProgramm(int index) throws IndexOutOfBoundsException {
 		if (index%2 != 0 || index < 100 || index > 498){
-			throw new IndexOutOfBoundsException("available index is 100 to 998, only even number");
+			throw new IndexOutOfBoundsException("available index is 100 to 498, only even number");
+		}
+	}
+	
+	private void verifyIndexData(int index) throws IndexOutOfBoundsException {
+		if (index%2 != 0 || index < 500 || index > 998){
+			throw new IndexOutOfBoundsException("available index is 500 to 998, only even number");
 		}
 	}
 	
@@ -133,9 +158,10 @@ public class MemoryController {
 			}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER){
-					int id = Integer.valueOf(((MemoryPanel) e.getComponent().getParent()).getIdTextField().substring(0, 3));
+					int id = ((MemoryPanel) e.getComponent().getParent()).getId();
 					Word newWord = null;
 					String written = ((JTextField) e.getComponent()).getText();
+					((JTextField) e.getComponent()).setBackground(Color.WHITE);
 					try {
 					if(e.getComponent().getParent().getParent().getName().equals("programmView")){
 						if (e.getComponent().getName().equals("binaryField")){
@@ -151,9 +177,9 @@ public class MemoryController {
 						}
 					}
 					model.put(id, newWord);
-					memoryPanels.get(id).updateFields(newWord);
+					memoryPanels.get(id).updateFields(newWord, false);
 					} catch (IllegalArgumentException exp) {
-						memoryPanels.get(id).updateFields(model.get(id));
+						memoryPanels.get(id).updateFields(model.get(id), false);
 						memoryPanels.get(id).showError();
 					}
 				}
