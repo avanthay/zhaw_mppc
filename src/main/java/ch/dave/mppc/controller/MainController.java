@@ -3,6 +3,13 @@ package ch.dave.mppc.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
 
 import ch.dave.mppc.model.Command;
 import ch.dave.mppc.model.Register;
@@ -20,6 +27,7 @@ public class MainController {
 	private ButtonController dataMemoryButtons;
 	
 	private boolean programmEnd = false;
+	private Thread go;
 	
 	
 	public MainController(){
@@ -32,7 +40,7 @@ public class MainController {
 		mainView.setMemoryView(memoryController.getMemoryView());
 		mainView.setButtonBar(controllButtons.getButtonBar());
 		
-		programmMemoryButtons = new ButtonController("<", ">");
+		programmMemoryButtons = new ButtonController("<", "load", "save", ">");
 		memoryController.getMemoryView().setProgrammButtonBar(programmMemoryButtons.getButtonBar());
 		
 		dataMemoryButtons = new ButtonController("<", ">");
@@ -54,16 +62,15 @@ public class MainController {
 		controllButtons.setActionListener("Start", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!programmEnd){
-					Thread go = new Thread(new Programm(false, 0));
+					go = new Thread(new Programm(false, 0));
 					go.start();
-					showView();
 				}
 			}
 		});
 		controllButtons.setActionListener("Slow", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					if (!programmEnd){
-						Thread go = new Thread(new Programm(false, 500));
+						go = new Thread(new Programm(false, 200));
 						go.start();
 				}
 			}
@@ -94,6 +101,59 @@ public class MainController {
 		programmMemoryButtons.setActionListener("<", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				memoryController.scrollProgrammPanel(-1);
+				showView();
+			}
+		});
+		programmMemoryButtons.setActionListener("load", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser code = new JFileChooser();
+				code.showOpenDialog(null);
+				if (code.getSelectedFile() == null){
+					return;
+				}
+				try {
+					BufferedReader reader = new BufferedReader(new FileReader(code.getSelectedFile()));
+					String zeile = reader.readLine();
+					boolean binary = false;
+					if (zeile.equals("binary")){
+						binary = true;
+					}
+					while ((zeile = reader.readLine()) != null) {
+						String[] line = zeile.split(" ", 2);
+						if (binary){
+							memoryController.setCommand(Integer.valueOf(line[0]), new Command(new Word(line[1])), false);							
+						} else {
+							memoryController.setCommand(Integer.valueOf(line[0]), new Command(line[1]), false);
+						}
+					}
+					if (reader != null){
+						reader.close();
+					}
+				} catch (IOException exp) {
+				}
+				showView();
+			}
+		});
+		programmMemoryButtons.setActionListener("save", new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser code = new JFileChooser();
+				code.showSaveDialog(null);
+				if (code.getSelectedFile() == null){
+					return;
+				}
+				try {
+					BufferedWriter writer = new BufferedWriter(new FileWriter(code.getSelectedFile()));
+//					writer.write("binary\n");
+					writer.write("mnemonics\n");
+					for (int i = 100; i < 500; i += 2){
+//						writer.write("" + i + " " + memoryController.getMemoryPanel(i).getWord() + "\n");
+						writer.write("" + i + " " + new Command(memoryController.getMemoryPanel(i).getWord()).getMnemonics() + "\n");
+					}
+					if (writer != null){
+						writer.close();
+					}
+				} catch (IOException exp) {
+				}
 				showView();
 			}
 		});
@@ -131,9 +191,7 @@ public class MainController {
 		public void run(){
 			while (!programmEnd){
 				doStep(colored);
-				if (sleepTime > 0){
 					showView();
-				}
 				try {
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
