@@ -22,8 +22,8 @@ public class Command extends Word{
 		if(registerNr > 3 || registerNr < 0){
 			throw new IllegalArgumentException("RegisterNr has to be min 0 max 3");
 		}
-		if (registerNr < 500 || registerNr > 998 || registerNr%2 != 0){
-			throw new IllegalArgumentException("Adress has to be between 500 and 998, and Adress has to been an even number");
+		if (address < 100 || address > 998 || address%2 != 0){
+			throw new IllegalArgumentException("Adress has to be between 100 and 998, and Adress has to been an even number");
 		}
 		if (number < -16384 || number > 16383){
 			throw new IllegalArgumentException("Number to add has to be between -16384 & 16383");
@@ -323,8 +323,8 @@ public class Command extends Word{
 	}
 	
 	private void createAdress(int address){
-		if (address < 500 || address > 998 || address%2 != 0){
-			throw new IllegalArgumentException("Address has to be between 500 and 998, and Adress has to been an even number");
+		if (address < 100 || address > 998 || address%2 != 0){
+			throw new IllegalArgumentException("Address has to be between 100 and 998, and Adress has to been an even number");
 		}
 		this.address = address;
 	}

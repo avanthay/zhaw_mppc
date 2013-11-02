@@ -19,6 +19,8 @@ public class MainController {
 	private ButtonController programmMemoryButtons;
 	private ButtonController dataMemoryButtons;
 	
+	private boolean programmEnd = false;
+	
 	
 	public MainController(){
 		mainView = new MainView();
@@ -57,20 +59,28 @@ public class MainController {
 		});
 		controllButtons.setActionListener("Slow", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				showView();
+					if (!programmEnd){
+						Thread go = new Thread(new Programm(false));
+						go.run();
+				}
 			}
 		});
 		controllButtons.setActionListener("Step", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Programm(true).doStep();
-				
-				showView();
+					doStep(true);
 			}
 		});
 		controllButtons.setActionListener("Reset", new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				programmEnd = false;
+				memoryController.getCommand(100);
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(100), true);
+				registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, new Command("END"), true);
+				registerController.updateRegisterPanel(Register.AKKU, new Word(0), true);
+				registerController.updateRegisterPanel(Register.REGISTER_1, new Word(0), true);
+				registerController.updateRegisterPanel(Register.REGISTER_2, new Word(0), true);
+				registerController.updateRegisterPanel(Register.REGISTER_3, new Word(0), true);
+				registerController.updateRegisterPanel(Register.CARRY, new Word(0), true);
 				showView();
 			}
 		});
@@ -110,136 +120,170 @@ public class MainController {
 		}
 
 		public void run(){
-			while (true){
-				doStep();
+			while (!programmEnd){
+				doStep(colored);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+	}
 		
-		public void doStep(){
-			// lade Befehl in Befehlsregister
-			int aktuellerBefehl = registerController.getWord(Register.BEFEHLSZAEHLER, colored).getValue();
-			registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, memoryController.getCommand(aktuellerBefehl), colored);
-			// befehl interpretieren
-			doCommand((Command) registerController.getRegisterPanel(Register.BEFEHLSREGISTER).getWord());
-			//...
+	private void doStep(boolean colored){
+		// lade Befehl in Befehlsregister
+		int aktuellerBefehl = registerController.getWord(Register.BEFEHLSZAEHLER, colored).getValue();
+		registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, memoryController.getCommand(aktuellerBefehl), colored);
+		// befehl interpretieren
+		doCommand((Command) registerController.getRegisterPanel(Register.BEFEHLSREGISTER).getWord(), colored);
+		showView();
+	}
+	
+	private void doCommand(Command command, boolean colored){
+		String name = command.getName();
+		int number = command.getNumber();
+		int address = command.getAddress();
+		Word akkuWord = registerController.getWord(Register.AKKU, false);
+		String register = null;
+		if (command.getRegisterNr() == 0){
+			register = Register.AKKU;
+		} else if (command.getRegisterNr() == 1){
+			register = Register.REGISTER_1;
+		} else if (command.getRegisterNr() == 2){
+			register = Register.REGISTER_2;
+		} else if (command.getRegisterNr() == 3){
+			register = Register.REGISTER_3;
 		}
-		
-		public void doCommand(Command command){
-			String name = command.getName();
-			int number = command.getNumber();
-			int address = command.getAddress();
-			Word akkuWord = registerController.getWord(Register.AKKU, false);
-			String register = null;
-			if (command.getRegisterNr() == 0){
-				register = Register.AKKU;
-			} else if (command.getRegisterNr() == 1){
-				register = Register.REGISTER_1;
-			} else if (command.getRegisterNr() == 2){
-				register = Register.REGISTER_2;
-			} else if (command.getRegisterNr() == 3){
-				register = Register.REGISTER_3;
-			}
-				
-			if (name.equals("CLR")){
-				registerController.updateRegisterPanel(register, new Word(0), colored);
-			} else if (name.equals("ADD")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				registerController.getRegisterPanel(register).colorateFields(colored);
-				if (akkuWord.add(registerController.getWord(register, colored))){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
-			} else if (name.equals("ADDD")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.add(new Word(number))){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);					
-				}
-				registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
-			} else if (name.equals("INC")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.add(new Word(1))){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
-			} else if (name.equals("DEC")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.add(new Word(-1))){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
-			} else if (name.equals("LWDD")) {
-				registerController.updateRegisterPanel(register, memoryController.getData(address, colored), colored);
-			} else if (name.equals("SWDD")){
-				memoryController.setData(address, registerController.getWord(register, colored), colored);
-			} else if (name.equals("SRA")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.getStringAt(15).equals("1")){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getStringAt(0).concat(akkuWord.getSequence(0, 14))), colored);
-			} else if (name.equals("SLA")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.getStringAt(1).equals("1")){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getStringAt(0).concat(akkuWord.getSequence(2)).concat("0")), colored);
-			} else if (name.equals("SRL")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.getStringAt(15).equals("1")){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getSequence(0, 14)), colored);
-			} else if (name.equals("SLL")){
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
-				if (akkuWord.getStringAt(0).equals("1")){
-					registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
-				}
-				registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getSequence(1, 15).concat("0")), colored);
-			} else if (name.equals("AND")){
-				Word andWord = new Word(0);
-				for (int i = 0; i < 16; i++){
-					String akkuBit = akkuWord.getStringAt(i);
-					String registerBit = registerController.getWord(register, colored).getStringAt(i);
-					if (akkuBit.equals("1") && registerBit.equals("1")){
-						andWord.setStringAt(i, "1");
-					}
-				}
-				registerController.updateRegisterPanel(Register.AKKU, andWord, colored);
-			} else if (name.equals("OR")) {
-				Word orWord = new Word(0);
-				for (int i = 0; i < 16; i++){
-					String akkuBit = akkuWord.getStringAt(i);
-					String registerBit = registerController.getWord(register, colored).getStringAt(i);
-					if (akkuBit.equals("1") || registerBit.equals("1")){
-						orWord.setStringAt(i, "1");
-					} 
-				}
-				registerController.updateRegisterPanel(Register.AKKU, orWord, colored);
-			} else if (name.equals("NOT")) {
-				Word notWord = new Word(0);
-				for (int i = 0; i < 16; i++){
-					if (akkuWord.getStringAt(i).equals("0")){
-						notWord.setStringAt(i, "1");
-					}
-				}
-				registerController.updateRegisterPanel(Register.AKKU, notWord, colored);
-	//weitere Command entschlŸsseln hier!
-				
-				
-				
-				
-				
-				
-			} else {
-				throw new IllegalArgumentException("Command " + name + " doesn't exist");
 			
+		if (name.equals("CLR")){
+			registerController.updateRegisterPanel(register, new Word(0), colored);
+		} else if (name.equals("ADD")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			registerController.getRegisterPanel(register).colorateFields(colored);
+			if (akkuWord.add(registerController.getWord(register, colored))){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
 			}
-			registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(Register.BEFEHLSZAEHLER, colored).
-					addWithoutCarry(new Word(2)), colored);
-
-			
-		}
+			registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
+		} else if (name.equals("ADDD")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.add(new Word(number))){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);					
+			}
+			registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
+		} else if (name.equals("INC")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.add(new Word(1))){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
+		} else if (name.equals("DEC")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.add(new Word(-1))){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, akkuWord, colored);
+		} else if (name.equals("LWDD")) {
+			registerController.updateRegisterPanel(register, memoryController.getData(address, colored), colored);
+		} else if (name.equals("SWDD")){
+			memoryController.setData(address, registerController.getWord(register, colored), colored);
+		} else if (name.equals("SRA")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.getStringAt(15).equals("1")){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getStringAt(0).concat(akkuWord.getSequence(0, 14))), colored);
+		} else if (name.equals("SLA")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.getStringAt(1).equals("1")){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getStringAt(0).concat(akkuWord.getSequence(2)).concat("0")), colored);
+		} else if (name.equals("SRL")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.getStringAt(15).equals("1")){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getSequence(0, 14)), colored);
+		} else if (name.equals("SLL")){
+			registerController.updateRegisterPanel(Register.CARRY, new Word(0), false);
+			if (akkuWord.getStringAt(0).equals("1")){
+				registerController.updateRegisterPanel(Register.CARRY, new Word(1), colored);
+			}
+			registerController.updateRegisterPanel(Register.AKKU, new Word(akkuWord.getSequence(1, 15).concat("0")), colored);
+		} else if (name.equals("AND")){
+			Word andWord = new Word(0);
+			for (int i = 0; i < 16; i++){
+				String akkuBit = akkuWord.getStringAt(i);
+				String registerBit = registerController.getWord(register, colored).getStringAt(i);
+				if (akkuBit.equals("1") && registerBit.equals("1")){
+					andWord.setStringAt(i, "1");
+				}
+			}
+			registerController.updateRegisterPanel(Register.AKKU, andWord, colored);
+		} else if (name.equals("OR")) {
+			Word orWord = new Word(0);
+			for (int i = 0; i < 16; i++){
+				String akkuBit = akkuWord.getStringAt(i);
+				String registerBit = registerController.getWord(register, colored).getStringAt(i);
+				if (akkuBit.equals("1") || registerBit.equals("1")){
+					orWord.setStringAt(i, "1");
+				} 
+			}
+			registerController.updateRegisterPanel(Register.AKKU, orWord, colored);
+		} else if (name.equals("NOT")) {
+			Word notWord = new Word(0);
+			for (int i = 0; i < 16; i++){
+				if (akkuWord.getStringAt(i).equals("0")){
+					notWord.setStringAt(i, "1");
+				}
+			}
+			registerController.updateRegisterPanel(Register.AKKU, notWord, colored);
+		} else if (name.equals("BZ")) {
+			if (akkuWord.getValue() == 0){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(register, colored), colored);
+				return;
+			}
+		} else if (name.equals("BNZ")) {
+			if (akkuWord.getValue() != 0){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(register, colored), colored);
+				return;
+			}
+		} else if (name.equals("BC")) {
+			if (registerController.getWord(Register.CARRY, colored).getValue() == 1){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(register, colored), colored);
+				return;
+			}
+		} else if (name.equals("B")) {
+			registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(register, colored), colored);
+			return;
+		} else if (name.equals("BZD")) {
+			if (akkuWord.getValue() == 0){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(address), colored);
+				return;					
+			}
+		} else if (name.equals("BNZD")) {
+			if (akkuWord.getValue() != 0){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(address), colored);
+				return;					
+			}
+		} else if (name.equals("BCD")) {
+			if (registerController.getWord(Register.CARRY, colored).getValue() == 1){
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(address), colored);
+				return;					
+			}
+		} else if (name.equals("BD")) {
+			registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(address), colored);
+			return;
+		} else if (name.equals("END")) {
+			programmEnd = true;
+			return;
+		} else {
+			throw new IllegalArgumentException("Command " + name + " doesn't exist");
 		
+		}
+		registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, registerController.getWord(Register.BEFEHLSZAEHLER, colored).
+				addWithoutCarry(new Word(2)), colored);
 	}
 	
 }
