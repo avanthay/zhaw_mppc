@@ -53,34 +53,41 @@ public class MainController {
 	private void setListeners(){
 		controllButtons.setActionListener("Start", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				showView();
+				if (!programmEnd){
+					Thread go = new Thread(new Programm(false, 0));
+					go.start();
+					showView();
+				}
 			}
 		});
 		controllButtons.setActionListener("Slow", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					if (!programmEnd){
-						Thread go = new Thread(new Programm(false));
-						go.run();
+						Thread go = new Thread(new Programm(false, 500));
+						go.start();
 				}
 			}
 		});
 		controllButtons.setActionListener("Step", new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					doStep(true);
+				if (!programmEnd){
+					doStep(false);
+					showView();
+				}
 			}
 		});
 		controllButtons.setActionListener("Reset", new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				programmEnd = false;
 				memoryController.getCommand(100);
-				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(100), true);
-				registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, new Command("END"), true);
-				registerController.updateRegisterPanel(Register.AKKU, new Word(0), true);
-				registerController.updateRegisterPanel(Register.REGISTER_1, new Word(0), true);
-				registerController.updateRegisterPanel(Register.REGISTER_2, new Word(0), true);
-				registerController.updateRegisterPanel(Register.REGISTER_3, new Word(0), true);
-				registerController.updateRegisterPanel(Register.CARRY, new Word(0), true);
+				boolean show = false;
+				programmEnd = false;
+				registerController.updateRegisterPanel(Register.BEFEHLSZAEHLER, new Word(100), show);
+				registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, new Command("END"), show);
+				registerController.updateRegisterPanel(Register.AKKU, new Word(0), show);
+				registerController.updateRegisterPanel(Register.REGISTER_1, new Word(0), show);
+				registerController.updateRegisterPanel(Register.REGISTER_2, new Word(0), show);
+				registerController.updateRegisterPanel(Register.REGISTER_3, new Word(0), show);
+				registerController.updateRegisterPanel(Register.CARRY, new Word(0), show);
 				showView();
 			}
 		});
@@ -114,16 +121,21 @@ public class MainController {
 	private class Programm implements Runnable{
 		
 		private boolean colored;
+		private int sleepTime;
 		
-		public Programm(boolean colored){
+		public Programm(boolean colored, int sleepTime){
 			this.colored = colored;
+			this.sleepTime = sleepTime;
 		}
 
 		public void run(){
 			while (!programmEnd){
 				doStep(colored);
+				if (sleepTime > 0){
+					showView();
+				}
 				try {
-					Thread.sleep(100);
+					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -137,7 +149,6 @@ public class MainController {
 		registerController.updateRegisterPanel(Register.BEFEHLSREGISTER, memoryController.getCommand(aktuellerBefehl), colored);
 		// befehl interpretieren
 		doCommand((Command) registerController.getRegisterPanel(Register.BEFEHLSREGISTER).getWord(), colored);
-		showView();
 	}
 	
 	private void doCommand(Command command, boolean colored){

@@ -61,7 +61,6 @@ public class MemoryController {
 	}
 	
 	public Command getCommand(int index){
-		verifyIndexProgramm(index);
 		updateProgrammPanels(index);
 		return (Command) model.get(index);
 	}
@@ -107,7 +106,7 @@ public class MemoryController {
 			actualProgramm = 478;
 		}
 		focusedMemoryPanel = actualProgramm;
-		for (int i = (actualProgramm - 10); i < (actualProgramm + 22); i = i+2){
+		for (int i = (actualProgramm - 10); i < (actualProgramm + 21); i = i+2){
 			view.setProgrammMemoryPanel(memoryPanels.get(i));
 		}
 	}
