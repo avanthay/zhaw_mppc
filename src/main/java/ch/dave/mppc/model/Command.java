@@ -75,10 +75,11 @@ public class Command extends Word{
 			createMnemonics(name, registerNr);
 		} else if (name.equals("ADD")) {
 			setWordString("0000" + getBinaryRegister() + "1110000000");
-			this.number = -1;
 			createMnemonics(name, registerNr);
 		} else if (name.equals("ADDD")) {
 			setWordString("1" + new Word(number).getSequence(1));
+			// bugfix for wrong mnemorics representation
+			this.registerNr = 17000;
 			createMnemonics(name, number);
 		} else if (name.equals("INC")) {
 			setWordString("0000000100000000");
@@ -159,6 +160,8 @@ public class Command extends Word{
 		if (getIntAt(0) == 1){
 			this.name = "ADDD";
 			this.number = new Word(getStringAt(1).concat(getSequence(1))).getValue();
+			// bugfix for wrong mnemorics representation
+			this.registerNr = 17000;
 			createMnemonics(name, number);
 		} else if (getIntAt(1) == 1){
 			if (getIntAt(2) == 1){
@@ -260,10 +263,10 @@ public class Command extends Word{
 	}
 	
 	private void createMnemonics(String name, int anumber){
-		if (anumber == number){			
-			this.mnemonics = name + " #" + number;
-		} else if (anumber == registerNr){
+		if (anumber == registerNr){
 			this.mnemonics = name + " R" + registerNr;
+		} else if (anumber == number){			
+			this.mnemonics = name + " #" + number;
 		} else if (anumber == address){
 			this.mnemonics = name + " #" + address;			
 		}
