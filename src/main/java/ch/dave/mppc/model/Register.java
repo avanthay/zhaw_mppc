@@ -1,62 +1,13 @@
 package ch.dave.mppc.model;
 
-/**
- * Ein Register ist eine Subklasse von Word
- * und ist 16bit lang. Beim instanzieren muss ein Name übergeben werden
- * Das Register wird mit 0-en belegt
- * 
- * @author dave
- * @version 1.0
- */
-public class Register extends Word{
+public abstract class Register {
 	
-	private String name;
-	
-	/**
-	 * Der Register wird mit 0-en belegt bei der Initialisierung
-	 * 
-	 * @param name Der Name des Registers
-	 */
-	public Register(String name){
-		super();
-		this.name = name;
-	}
-	
-	/**
-	 * setzt das Register auf 0 zurück
-	 */
-	public void resetRegister(){
-		setWord("0");
-	}
-	
-	
-	
-	// Getter und Setter
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	
-	
-	// toString & hashCode
+	public final static String BEFEHLSZAEHLER = "Befehlsz�hler";
+	public final static String BEFEHLSREGISTER = "Befehlsregister";
+	public final static String AKKU = "Akku";
+	public final static String REGISTER_1 = "Register 1";
+	public final static String REGISTER_2 = "Register 2";
+	public final static String REGISTER_3 = "Register 3";
+	public final static String CARRY = "Carry";
 
-	@Override
-	public String toString(){
-		return name;
-	}
-	
-	@Override
-	public int hashCode(){
-		int code = 0;
-		for(int i = 0; i < name.length(); i++){
-			code += name.charAt(i) * 17 * i;
-		}
-		return code;
-	}
-	
 }

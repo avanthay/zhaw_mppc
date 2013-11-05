@@ -9,20 +9,21 @@ package ch.dave.mppc.model;
  */
 public class Word {
 
-	private char MSb;
+	private int MSb;
 	private String amount;
 	private int value;
 
 	public Word() {
-		setWord("0");
+		setWordString("0");
 	}
 
 	public Word(String string) {
-		setWord(string);
+		setWordString(string);
 	}
 
-	public Word(char MSb, String amount) {
-		setWord(MSb, amount);
+	public Word(int MSb, String amount) {
+		setMSb(MSb);
+		setAmount(amount);
 	}
 	
 	public Word(int value){
@@ -42,11 +43,12 @@ public class Word {
 	
 	private void calculateValue() {
 		int word = Integer.valueOf(amount, 2);
-		if (MSb == '1') {
+		if (MSb == 1) {
 			word = word - 32768;
 		}
 		this.value = word;
 	}
+
 
 	
 	
@@ -55,15 +57,45 @@ public class Word {
 	/**
 	 * 
 	 * @param index
-	 *            Index des gewÃ¼nschten char im gesamten Wort (16bit)
+	 *            Index des gewŸnschten index im gesamten Wort (16bit)
 	 * @return das char aus dem 16bit Index
 	 */
-	public char getCharAt(int index) {
+	public int getIntAt(int index) {
 		if (index == 0) {
-			return this.MSb;
+			return Integer.valueOf(String.valueOf(this.MSb));
 		} else {
-			return amount.charAt(index - 1);
+			return Integer.valueOf(String.valueOf(amount.charAt(index - 1)));
 		}
+	}
+	
+	public String getStringAt(int index) {
+		return String.valueOf(getIntAt(index));
+	}
+	
+	public void setStringAt(int index, String value){
+		if (index == 0){
+			this.MSb = Integer.valueOf(value);
+		} else {
+			if (index > 1){
+				this.amount = amount.substring(0, index-1).concat(value).concat(amount.substring(index));
+			} else if (index == 1){
+				this.amount = value.concat(amount.substring(index));
+			}
+		}
+		calculateValue();
+	}
+	
+	public String getSequence(int start){
+		return getSequence(start, 15);
+	}
+	
+	public String getSequence(int start, int end){
+		return getWordString().substring(start, end+1);
+	}
+
+	
+	public String getSplittedString(){
+		return getSequence(0, 7) + " " + getSequence(8);
 	}
 
 	/**
@@ -71,7 +103,7 @@ public class Word {
 	 * @return Das MSb (Vorzeichenbit). Dieser ist mit 1 negativ und mit 0
 	 *         positiv
 	 */
-	public char getMSb() {
+	public int getMSb() {
 		return MSb;
 	}
 
@@ -81,7 +113,7 @@ public class Word {
 	 *            Das MSb (Vorzeichenbit). Dieser kann mit 1 negativ und mit 0
 	 *            positiv gesetzt werden
 	 */
-	public void setMSb(char MSb) {
+	public void setMSb(int MSb) {
 		if (String.valueOf(MSb).matches("(0*1*)*")) {
 			this.MSb = MSb;
 		}
@@ -96,6 +128,7 @@ public class Word {
 	 *            Den 15bit langen Wert des Wortes, ohne MSb (Vorzeichenbit)
 	 */
 	public void setAmount(String amount) {
+		amount = amount.replaceAll(" ", "");
 		if (amount.matches("(0*1*)*") == false) {
 			setAmount("0");
 		} else if (amount.length() > 15) {
@@ -119,32 +152,30 @@ public class Word {
 	 * @param string
 	 *            Das gesamte Wort (16bit, inklusive MSb)
 	 */
-	public void setWord(String string) {
-		if (string == null){
-			setWord("0");
+	public void setWordString(String string) throws IllegalArgumentException{
+		if (string != null){
+		string = string.replaceAll(" ", "");
+		}
+		if (string.equals("")){
+			throw new IllegalArgumentException("Word " + string + " is not accepted as word");
 		} else if (string.matches("(0*1*)*") == false) {
-			setWord("0");
+			throw new IllegalArgumentException("Word " + string + "is not accepted as word");
 		} else if (string.length() > 16) {
-			setWord(string.substring(-(16 - string.length())));
+			setWordString(string.substring(-(16 - string.length())));
 		} else if (string.length() == 16) {
-			setMSb(string.charAt(0));
+			setMSb(Integer.valueOf(string.substring(0, 1)));
 			setAmount(string.substring(1));
 		} else if (string.length() < 16) {
-			setMSb('0');
+			setMSb(0);
 			setAmount(string);
 		}
 	}
-
-	public void setWord(char MSb, String amount) {
-		setMSb(MSb);
-		setAmount(amount);
-	}
 	
-	public void setValue(int value){
+	public void setValue(int value) throws IllegalArgumentException{
 		if (value == (short) value){
-			setWord(Integer.toBinaryString(value));
+			setWordString(Integer.toBinaryString(value));
 		} else {
-			setWord("0");
+			throw new IllegalArgumentException("Word " + value + " is to big - please choose an index between -32768 and 32767");
 		}
 	}
 
@@ -152,7 +183,7 @@ public class Word {
 	 * 
 	 * @return das gesamte Wort als String, inklusive MSb (16bit)
 	 */
-	public String getWord() {
+	public String getWordString() {
 		String word = String.valueOf(MSb);
 		return word.concat(amount);
 	}
@@ -161,16 +192,100 @@ public class Word {
 		return value;
 	}
 	
+	/**
+	 * 
+	 * @param word das zu addierende Wort
+	 * @return true bei einem †berlauf
+	 */
+	public boolean add(Word word){
+		int sum = value + word.value;
+		if (sum == (short) sum){
+			setValue(sum);
+			return false;
+		}
+		setValue((short) sum);
+		return true;
+	}
+	
+	public Word addWithoutCarry(Word word){
+		add(word);
+		return this;
+	}
+	
+	/**
+	 * 
+	 * @param left true for left shift - false for right shift
+	 * @return true bei †berlauf
+	 */
+	public boolean shiftArithmetic(boolean left){
+		if (left){
+			int over = getIntAt(1);
+			setValue((short) (getValue()*2));
+			if (over == 1){
+				return true;
+			}
+			return false;
+		} else {
+			if(getValue()%2 == 1){
+				setValue((getValue() - 1) / 2);
+				return true;
+			} else {
+				setValue(getValue() / 2);
+				return false;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param left true for left shift - false for right shift
+	 * @return true bei †berlauf
+	 */
+	public boolean shiftLogic(boolean left){
+		if (left){
+			int over = getIntAt(0);
+			setMSb(getIntAt(1));
+			setAmount(amount.concat("0"));
+			if (over == 1){
+				return true;
+			}
+			return false;
+		} else {
+			int over = getIntAt(15);
+			setAmount(getStringAt(0).concat(amount.substring(0, 14)));
+			setMSb(0);
+			if (over == 1){
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	
+	
 	// toString & haschcode
 
 	@Override
 	public String toString() {
-		return getWord();
+		return getWordString();
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if (o instanceof Word == false)
+			return false;
+		else if (value == ((Word) o).value)
+			return true;
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.value;
+		int result = 17;
+		result = result * 47 + MSb;
+		for (int i = 0; i < amount.length(); i++)
+			result = result * 47 + amount.charAt(i);
+		return result;
 	}
 
 }
